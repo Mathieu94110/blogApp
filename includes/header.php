@@ -1,4 +1,3 @@
-<pre>
 <header>
     <a href="/" class="logo">BlogApp</a>
     <ul class="header-menu">
