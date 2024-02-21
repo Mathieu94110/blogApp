@@ -1,0 +1,48 @@
+.articles-container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: start;
+}
+
+.article {
+  flex: 0 1 30%;
+  margin: 1rem;
+  min-height: 20rem;
+  min-width: 260px;
+  cursor: pointer;
+}
+
+.article:hover .img-container {
+  transform: scale(1.1);
+}
+
+.category-container h2 {
+  font-size: 1.9rem;
+  padding: 0 1rem;
+}
+
+.article h2 {
+  font-size: 1.7rem;
+  padding: 1rem 1.5rem;
+}
+
+.img-container {
+  height: 15rem;
+  background-size: cover;
+  transition: transform(1s);
+}
+
+@media screen and (min-width: 660px) {
+  .article {
+    min-width: 30rem;
+    min-height: 41rem;
+  }
+  .article h2,
+  .category-container h2 {
+    font-size: 2.4rem;
+  }
+  .img-container {
+    height: 30rem;
+  }
+}
