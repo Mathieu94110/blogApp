@@ -30,6 +30,12 @@
   margin-bottom: 1rem;
   display: block;
 }
+.action {
+  margin-top: 2rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
 
 @media screen and (min-width: 660px) {
   .article-cover-img {
