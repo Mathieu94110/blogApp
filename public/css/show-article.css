@@ -17,9 +17,9 @@
 }
 
 .article-container {
-  padding-bottom: 10rem;
+  width: 100%;
   max-width: 1200px;
-  margin: 20px;
+  padding-bottom: 10rem;
 }
 
 .article-back {

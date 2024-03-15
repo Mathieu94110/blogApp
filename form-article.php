@@ -1,31 +1,55 @@
 <?php
+$pdo = require_once 'database.php';
+$statementReadOne = $pdo->prepare('SELECT * FROM article WHERE id = :id');
+$statementCreateOne = $pdo->prepare('
+  INSERT INTO article (
+    title,
+    category,
+    content,
+    image
+  ) VALUES (
+    :title,
+    :category,
+    :content,
+    :image
+  )
+');
+$statementUpdateOne = $pdo->prepare('
+  UPDATE article
+  SET
+    title=:title,
+    category=:category,
+    content=:content,
+    image=:image
+  WHERE id=:id;
+');
 const ERROR_REQUIRED = 'Veuillez renseigner ce champ';
 const ERROR_TITLE_TOO_SHORT = 'Le titre est trop court';
 const ERROR_CONTENT_TOO_SHORT = 'L\'article est trop court';
-const ERROR_IMAGE_URL = 'L\'image doit etre une url valide';
+const ERROR_IMAGE_URL = 'L\'image doit être une url valide';
 $filename = __DIR__ . '/data/articles.json';
-$_GET = filter_input_array(INPUT_GET, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-$id = $GET['id'] ?? '';
+$errors = [
+    'title' => '',
+    'image' => '',
+    'category' => '',
+    'content' => ''
+];
 $category = '';
+
+$_GET = filter_input_array(INPUT_GET, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$id = $_GET['id'] ?? '';
 if ($id) {
-    $articleIndex = array_search($id, array_column($articles, 'id'));
-    $article = $articles[$articleIndex];
+    $statementReadOne->bindValue(':id', $id);
+    $statementReadOne->execute();
+    $article = $statementReadOne->fetch();
     $title = $article['title'];
     $image = $article['image'];
     $category = $article['category'];
     $content = $article['content'];
 }
-$errors = [
-    'title' => '',
-    'image' => '',
-    'category' => '',
-    'content' => '',
-];
-if (file_exists($filename)) {
-    $articles = json_decode(file_get_contents($filename), true) ?? [];
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $_POST = filter_input_array(INPUT_POST, [
         'title' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'image' => FILTER_SANITIZE_URL,
@@ -35,10 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'flags' => FILTER_FLAG_NO_ENCODE_QUOTES
         ]
     ]);
-    $title = $_POST["title"] ?? '';
-    $image = $_POST["image"] ?? '';
-    $category = $_POST["category"] ?? '';
+    $title = $_POST['title'] ?? '';
+    $image = $_POST['image'] ?? '';
+    $category = $_POST['category'] ?? '';
     $content = $_POST['content'] ?? '';
+
 
     if (!$title) {
         $errors['title'] = ERROR_REQUIRED;
@@ -51,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!filter_var($image, FILTER_VALIDATE_URL)) {
         $errors['image'] = ERROR_IMAGE_URL;
     }
+
     if (!$category) {
         $errors['category'] = ERROR_REQUIRED;
     }
@@ -60,34 +86,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (mb_strlen($content) < 50) {
         $errors['content'] = ERROR_CONTENT_TOO_SHORT;
     }
+
     if (empty(array_filter($errors, fn ($e) => $e !== ''))) {
         if ($id) {
-            $articles[$articleIndex]['title'] = $title;
-            $articles[$articleIndex]['image'] = $image;
-            $articles[$articleIndex]['category'] = $category;
-            $articles[$articleIndex]['content'] = $content;
+            $statementUpdateOne->bindValue(':title', $title);
+            $statementUpdateOne->bindValue(':image', $image);
+            $statementUpdateOne->bindValue(':category', $category);
+            $statementUpdateOne->bindValue(':content', $content);
+            $statementUpdateOne->bindValue(':id', $id);
+            $statementUpdateOne->execute();
         } else {
-            $articles = [...$articles, [
-                'title' => $title,
-                'image' => $image,
-                'category' => $category,
-                'content' => $content,
-                'id' => time()
-            ]];
+            $statementCreateOne->bindValue(':title', $title);
+            $statementCreateOne->bindValue(':image', $image);
+            $statementCreateOne->bindValue(':category', $category);
+            $statementCreateOne->bindValue(':content', $content);
+            $statementCreateOne->execute();
         }
-        file_put_contents($filename, json_encode($articles));
         header('Location: /');
     }
 }
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/public/css/form-article.css">
     <?php require_once 'includes/head.php' ?>
+    <link rel="stylesheet" href="/public/css/form-article.css">
     <title><?= $id ? 'Modifier' : 'Créer' ?> un article</title>
 </head>
 
@@ -95,19 +122,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <?php require_once 'includes/header.php' ?>
         <div class="content">
-            <div class="block form-container">
+            <div class="block p-20 form-container">
                 <h1><?= $id ? 'Modifier' : 'Écrire' ?> un article</h1>
-                <form action="/form-article.php" method="post">
+                <form action="/form-article.php<?= $id ? "?id=$id" : '' ?>" , method="POST">
                     <div class="form-control">
-                        <label for='title'>Titre</label>
-                        <input type="text" name='title' id="title" value=<?= $title ?? '' ?>>
+                        <label for="title">Titre</label>
+                        <input type="text" name="title" id="title" value="<?= $title ?? '' ?>">
                         <?php if ($errors['title']) : ?>
                             <p class="text-danger"><?= $errors['title'] ?></p>
                         <?php endif; ?>
                     </div>
                     <div class="form-control">
                         <label for="image">Image</label>
-                        <input type="text" name="image" id="image" value=<?= $image ?? '' ?>>
+                        <input type="text" name="image" id="image" value="<?= $image ?? '' ?>">
                         <?php if ($errors['image']) : ?>
                             <p class="text-danger"><?= $errors['image'] ?></p>
                         <?php endif; ?>
@@ -124,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
                     </div>
                     <div class="form-control">
-                        <label for="content">Contenu</label>
+                        <label for="content">Content</label>
                         <textarea name="content" id="content"><?= $content ?? '' ?></textarea>
                         <?php if ($errors['content']) : ?>
                             <p class="text-danger"><?= $errors['content'] ?></p>
@@ -139,6 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php require_once 'includes/footer.php' ?>
     </div>
+
 </body>
 
 </html>
