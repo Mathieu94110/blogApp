@@ -15,7 +15,7 @@ if (!$id) {
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
   <?php require_once 'includes/head.php' ?>

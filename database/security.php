@@ -13,20 +13,20 @@ class AuthDB
     function __construct(private PDO $pdo)
     {
         $this->statementRegister = $pdo->prepare('INSERT INTO user VALUES (
-      DEFAULT,
-      :firstname,
-      :lastname,
-      :email,
-      :password
-    )');
+            DEFAULT,
+            :firstname,
+            :lastname,
+            :email,
+            :password
+        )');
 
         $this->statementReadSession = $pdo->prepare('SELECT * FROM session WHERE id=:id');
         $this->statementReadUser = $pdo->prepare('SELECT * FROM user WHERE id=:id');
         $this->statementReadUserFromEmail = $pdo->prepare('SELECT * FROM user WHERE email=:email');
         $this->statementCreateSession = $pdo->prepare('INSERT INTO session VALUES (
-      :sessionid,
-      :userid
-    )');
+            :sessionid,
+            :userid
+        )');
         $this->statementDeleteSession = $pdo->prepare('DELETE FROM session WHERE id=:id');
     }
 
@@ -83,7 +83,7 @@ class AuthDB
         return;
     }
 
-    function getUserFromEmail(string $email): array
+    function getUserFromEmail(string $email): array | false
     {
         $this->statementReadUserFromEmail->bindValue(':email', $email);
         $this->statementReadUserFromEmail->execute();

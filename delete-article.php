@@ -1,9 +1,7 @@
 <?php
 require_once __DIR__ . '/database/database.php';
 $authDB = require_once __DIR__ . '/database/security.php';
-$articleDB = require_once __DIR__ . '/database/models/ArticleDB.php';
 
-$articles = [];
 $currentUser = $authDB->isLoggedin();
 if ($currentUser) {
     $articleDB = require_once __DIR__ . '/database/models/ArticleDB.php';

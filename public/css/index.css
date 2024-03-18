@@ -7,7 +7,7 @@
 
 .article {
   flex: 30%;
-  margin: 1rem;
+  margin:1rem;
   min-height: 41rem;
   cursor: pointer;
 }
@@ -18,14 +18,13 @@
 
 .newsfeed-content h2 {
   font-size: 1.9rem;
-  padding: 0 1rem;
+  padding:0 1rem;
 }
 
 .article h3 {
   font-size: 1.7rem;
-  padding: 1rem 1.5rem;
+  padding:1rem 1.5rem;
 }
-
 
 .img-container {
   height: 30rem;
@@ -50,6 +49,17 @@
   display: flex;
   flex-flow: row nowrap;
 }
+
+@media only screen and (max-width: 800px) {
+  .category-container {
+      display: none;
+  }
+  .articles-container { 
+      flex-flow: column;
+      align-items: unset;
+  }
+}
+
 
 .category-container {
   flex: 200px;

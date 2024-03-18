@@ -1,8 +1,8 @@
 <?php
 
 $dns = 'mysql:host=localhost;dbname=blog';
-$user = getenv('DB_USER');
-$pwd = getenv('DB_PWD');
+$user = 'root';
+$pwd = 'windows10';
 
 try {
     $pdo = new PDO($dns, $user, $pwd, [
