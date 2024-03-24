@@ -8,8 +8,8 @@
 .article-title {
   margin: 3rem 0;
   text-align: left;
-  font-size: 5rem;
-  font-weight: 400;
+  font-size: 1.8rem;
+  font-weight: 600;
 }
 
 .article-author {
@@ -38,8 +38,15 @@
 }
 
 .action {
-  margin-top:2rem;
+  margin-top: 2rem;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+}
+
+@media screen and (min-width: 600px) {
+  .article-title {
+    font-size: 5rem;
+  }
+
 }
